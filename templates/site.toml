@@ -1,0 +1,56 @@
+# Site profile: everything obench needs to know about one cluster.
+# Created by `obench new site @NAME@`. Fill in the TODO lines, then run:
+#   obench validate --site @NAME@
+#   obench doctor   --site @NAME@
+
+[site]
+description = "TODO: cluster name and GPU type"
+scheduler = "slurm"            # "slurm" (sbatch) or "local" (run directly, e.g. inside salloc)
+
+[node]
+gpus_per_node = 4              # TODO: physical GPU cards per node
+tiles_per_gpu = 2              # Intel Data Center GPU Max 1550: 2 tiles (stacks); 1100: 1
+gpu_mode = "tile"              # "tile": every tile is a device (Level Zero FLAT hierarchy)
+                               # "gpu":  every card is one device (COMPOSITE hierarchy)
+cores_per_node = 112           # TODO: physical CPU cores per node (all sockets)
+
+[toolchain]
+tag = "oneapi-TODO"            # names install directories, e.g. "oneapi-2025.2"
+# Shell lines that make icx/icpx, MPI, oneMKL and CMake available.
+setup = [
+  "source /opt/intel/oneapi/setvars.sh --force > /dev/null",   # TODO or module loads:
+  # "module load intel-oneapi-compilers intel-oneapi-mpi intel-oneapi-mkl cmake",
+]
+
+[slurm]
+partition = ""                 # TODO: GPU partition, if required
+account = ""                   # TODO: project/account, if required
+qos = ""
+constraint = ""
+directives = ["--exclusive"]   # extra #SBATCH lines, e.g. "--gpus-per-node=4"
+
+[mpi]
+# "srun", "mpiexec" (Intel MPI / MPICH Hydra), "none", or a full template using
+# {nodes} {ranks} {ranks_per_node} {cpus_per_rank} {threads_per_rank}.
+launcher = "srun"
+gpu_aware = true               # MPI can send GPU buffers directly (Intel MPI: I_MPI_OFFLOAD=1)
+[mpi.env]
+I_MPI_OFFLOAD = "1"
+# With srun and Intel MPI you may need the SLURM PMI library:
+# I_MPI_PMI_LIBRARY = "/usr/lib64/libpmi2.so"
+
+# Environment for every job on this site (values may use $VARS).
+[env]
+SYCL_CACHE_PERSISTENT = "1"
+
+[paths]
+install_root = "~/obench/install"   # application builds
+build_root = "~/obench/build"       # sources and build trees
+data_root = "~/obench/data"         # downloaded inputs (must be visible from compute nodes)
+results_root = "results"            # relative paths are inside this repository
+
+# Per-application overrides, e.g.:
+# [apps.gromacs]
+# version = "2025.3"
+# build_env = { GMX_SIMD = "AVX_512" }
+# run_env = { GMX_ENABLE_DIRECT_GPU_COMM = "1" }

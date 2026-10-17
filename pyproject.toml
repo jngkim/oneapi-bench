@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obench"
+version = "0.1.0"
+description = "Build and run HPC benchmarks with Intel oneAPI on SLURM GPU clusters"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+obench = "obench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+obench = ["gpu_bind.sh"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,39 @@
+# Workload @APP@/@NAME@. See docs/adding-a-workload.md for every option.
+
+[workload]
+title = "TODO: short title"
+kind = "published"             # bundled (ships with the app) | published | custom
+publisher = "TODO: who defined it, e.g. PRACE UEABS / NERSC / the app developers"
+reference = "TODO: URL describing the benchmark"
+description = ""
+size = "medium"                # tiny | small | medium | large | xlarge
+scaling = "strong"             # strong: fixed problem | weak: problem grows with devices
+status = "draft"               # draft -> unvalidated -> validated (after checking results)
+
+# Input files: downloaded once into the data directory ({input_dir}).
+# Use `path = "inputs/file"` instead of url for files kept in this repository.
+[[inputs]]
+url = "TODO: https://..."
+sha256 = ""                    # obench prints the value to paste here after the first fetch
+
+[run]
+nodes = [1]                    # default node counts (override: --nodes 1,2,4)
+devices_per_node = [1, "max"]  # default devices per node (override: --devices)
+ranks_per_device = 1
+repetitions = 3
+time_limit = "00:30:00"
+# Placeholders: {exe} {prefix} {input_dir} {app_dir} {src_dir} {nodes} {ranks}
+# {total_devices} {threads_per_rank} and every [params] entry.
+command = "{exe} TODO {input_dir}/TODO"
+
+# Parameters can be overridden with --set NAME=VALUE.
+# A value starting with "=" is arithmetic, e.g. "=128 * {total_devices}".
+[params]
+
+[metrics]
+primary = "TODO"               # key returned by hooks.parse()
+higher_is_better = true
+unit = ""
+
+# Thresholds read by hooks.checks() through ctx["validate"].
+[validate]

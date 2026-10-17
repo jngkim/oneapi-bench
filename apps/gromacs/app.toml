@@ -1,0 +1,34 @@
+# GROMACS molecular dynamics, SYCL build with oneAPI DPC++ for Intel GPUs.
+# Build flags follow the GROMACS 2026 installation guide ("SYCL GPU acceleration
+# for Intel GPUs"): https://manual.gromacs.org/current/install-guide/index.html
+
+[app]
+title = "GROMACS"
+description = "Biomolecular molecular dynamics; MPI + SYCL GPU offload of nonbonded, PME, bonded and update"
+homepage = "https://www.gromacs.org"
+license = "LGPL-2.1-or-later"
+default_version = "2026.4"
+
+[source]
+url = "https://ftp.gromacs.org/gromacs/gromacs-{version}.tar.gz"
+
+[build]
+script = "build.sh"
+check = ["bin/gmx_mpi"]
+time_limit = "02:00:00"
+
+[build.env]
+GMX_GPU_FFT_LIBRARY = "MKL"            # oneMKL GPU FFT; alternatives: ONEMATH, BBFFT
+# Recommended by the GROMACS guide for Intel Data Center GPU Max (PVC) and Xe2+.
+# For other Intel GPUs set GMX_GPU_NB_CLUSTER_SIZE = "4" and clear the next line.
+GMX_GPU_NB_CLUSTER_SIZE = "8"
+GMX_GPU_NB_NUM_CLUSTER_PER_CELL_X = "1"
+GMX_SIMD = ""                          # empty: detected on the build node, e.g. AVX_512
+GMX_USE_HEFFTE = "OFF"                 # ON: distributed GPU PME via heFFTe (build heffte first)
+CMAKE_EXTRA = ""
+
+[run]
+executable = "bin/gmx_mpi"
+
+[run.env]
+SYCL_CACHE_PERSISTENT = "1"            # cache JIT-compiled kernels between runs

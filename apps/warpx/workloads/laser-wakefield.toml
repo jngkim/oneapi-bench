@@ -1,0 +1,33 @@
+[workload]
+title = "Laser-wakefield acceleration, 64 x 64 x 512 cells, moving window"
+kind = "bundled"
+publisher = "WarpX developers (Examples/Physics_applications/laser_acceleration)"
+reference = "https://github.com/BLAST-WarpX/warpx/tree/development/Examples/Physics_applications/laser_acceleration"
+size = "small"
+scaling = "strong"
+status = "unvalidated"
+description = "Upstream 3D LWFA example (Gaussian laser, moving window, cubic shape factors) at the 'production' resolution suggested in the input file; diagnostics disabled."
+notes = "The field-probe reduced diagnostic of the input stays enabled; it writes a small text file every 10 steps."
+
+[run]
+nodes = [1]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:20:00"
+command = """{exe} {src_dir}/Examples/Physics_applications/laser_acceleration/inputs_base_3d \
+  max_step={steps} amr.n_cell={nx} {ny} {nz} amr.max_grid_size={max_grid_size} \
+  warpx.serialize_initial_conditions=0 diagnostics.enable=0 warpx.verbose=1 \
+  amrex.use_gpu_aware_mpi={mpi_gpu_aware} {extra}"""
+
+[params]
+nx = 64
+ny = 64
+nz = 512
+max_grid_size = 64
+steps = 200
+warmup_steps = 10
+extra = ""
+
+[metrics]
+primary = "cell_updates_per_s"
+higher_is_better = true
+unit = "cell-updates/s"

@@ -1,0 +1,36 @@
+[workload]
+title = "speed3d real-to-complex 512^3, double precision"
+kind = "bundled"
+publisher = "heFFTe developers (benchmarks/speed3d.cpp)"
+reference = "https://github.com/icl-utk-edu/heffte/tree/master/benchmarks"
+size = "medium"
+scaling = "strong"
+status = "unvalidated"
+description = "Forward and backward 3D R2C FFT of a 512^3 grid."
+notes = ""
+
+[run]
+nodes = [1, 2]
+devices_per_node = [1, 2, 4, "max"]
+min_devices = 1
+time_limit = "00:15:00"
+command = "{prefix}/bin/speed3d_{transform} {backend} {precision} {nx} {ny} {nz} {options}"
+
+[params]
+transform = "r2c"            # c2c | r2c | r2r
+backend = "onemkl"             # SYCL/oneMKL GPU backend
+precision = "double"           # float | double
+nx = 512
+ny = 512
+nz = 512
+# speed3d flags, e.g. -pencils / -slabs, -a2a / -a2av / -p2p / -p2p_pl, -reorder / -no-reorder,
+# -no-gpu-aware, -n10 (number of timed runs; default 5).
+options = ""
+
+[metrics]
+primary = "gflops"
+higher_is_better = true
+unit = "GFlop/s"
+
+[validate]
+backend = "onemkl"

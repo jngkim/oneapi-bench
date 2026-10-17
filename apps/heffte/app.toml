@@ -1,0 +1,25 @@
+# heFFTe: distributed 3D FFTs over MPI with the oneMKL SYCL GPU backend.
+# The speed3d benchmarks ship in the heFFTe repository (benchmarks/speed3d.cpp).
+
+[app]
+title = "heFFTe"
+description = "Highly Efficient FFT for Exascale: MPI-distributed 3D FFTs with oneMKL on Intel GPUs"
+homepage = "https://github.com/icl-utk-edu/heffte"
+license = "BSD-3-Clause"
+default_version = "2.4.1"
+
+[source]
+git = "https://github.com/icl-utk-edu/heffte.git"
+ref = "v{version}"
+
+[build]
+script = "build.sh"
+check = ["bin/speed3d_c2c", "bin/speed3d_r2c"]
+time_limit = "01:00:00"
+
+[build.env]
+HEFFTE_ENABLE_MKL = "OFF"              # also build the CPU oneMKL backend ("mkl")
+CMAKE_EXTRA = ""
+
+[run]
+executable = "bin/speed3d_c2c"

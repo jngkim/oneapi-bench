@@ -1,0 +1,42 @@
+[workload]
+title = "RNase A in water, dodecahedral box, PME, 17k atoms"
+kind = "bundled"
+publisher = "GROMACS developers (ftp.gromacs.org/pub/benchmarks)"
+reference = "https://ftp.gromacs.org/pub/benchmarks/"
+size = "tiny"
+scaling = "strong"
+status = "unvalidated"
+description = "Small classic GROMACS benchmark (16,816 atoms); a single-GPU latency-bound control."
+notes = "The .tpr is generated with gmx grompp in each run directory."
+
+[[inputs]]
+url = "https://ftp.gromacs.org/pub/benchmarks/rnase_bench_systems.tar.gz"
+sha256 = "c7f44cf73e9934872157143c57241004ebd7c8f5bcd9e5db492c49c81b8d7ede"
+
+[run]
+nodes = [1]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:30:00"
+prepare = ["{exe} grompp -f {input_dir}/rnase_dodec/pme_verlet.mdp -c {input_dir}/rnase_dodec/conf.gro -p {input_dir}/rnase_dodec/topol.top -o topol.tpr -maxwarn {maxwarn}"]
+command = """{exe} mdrun -s {tpr} -nsteps {nsteps} -maxh {maxh} -resethway -noconfout -cpt -1 \\
+  -nb {nb} -pme {pme} -bonded {bonded} -update {update} {npme_flag} \\
+  -ntomp {ntomp} -pin {pin} -g md.log {extra}"""
+
+[params]
+tpr = "topol.tpr"
+nsteps = 20000
+maxh = 0.25                     # mdrun stops cleanly after 0.99 x maxh hours
+pme = "gpu"
+bonded = "gpu"
+update = "auto"
+maxwarn = 1
+nb = "gpu"
+npme = "auto"                  # "auto": one PME rank when running several ranks
+max_threads = 16               # cap on OpenMP threads per rank (-ntomp)
+pin = "auto"
+extra = ""                     # additional mdrun flags
+
+[metrics]
+primary = "ns_per_day"
+higher_is_better = true
+unit = "ns/day"

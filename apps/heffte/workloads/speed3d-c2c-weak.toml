@@ -1,0 +1,36 @@
+[workload]
+title = "speed3d C2C weak scaling, 512 x 512 x 256 per device"
+kind = "custom"
+publisher = ""
+reference = "https://github.com/icl-utk-edu/heffte/tree/master/benchmarks"
+size = "medium"
+scaling = "weak"
+status = "unvalidated"
+description = "The grid grows along z with the number of devices (512 x 512 x 256N, about 1 GiB of complex data per device)."
+notes = "Weak-scaling definition of this repository; ideal behaviour is GFlop/s proportional to the device count."
+
+[run]
+nodes = [1, 2, 4]
+devices_per_node = [1, 2, 4, "max"]
+min_devices = 1
+time_limit = "00:15:00"
+command = "{prefix}/bin/speed3d_{transform} {backend} {precision} {nx} {ny} {nz} {options}"
+
+[params]
+transform = "c2c"            # c2c | r2c | r2r
+backend = "onemkl"             # SYCL/oneMKL GPU backend
+precision = "double"           # float | double
+nx = 512
+ny = 512
+nz = "=256 * {total_devices}"
+# speed3d flags, e.g. -pencils / -slabs, -a2a / -a2av / -p2p / -p2p_pl, -reorder / -no-reorder,
+# -no-gpu-aware, -n10 (number of timed runs; default 5).
+options = ""
+
+[metrics]
+primary = "gflops"
+higher_is_better = true
+unit = "GFlop/s"
+
+[validate]
+backend = "onemkl"

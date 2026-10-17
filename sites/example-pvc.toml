@@ -1,0 +1,39 @@
+# Example site: a SLURM cluster with 4 x Intel Data Center GPU Max 1550 per node
+# (2 tiles each), two Xeon sockets, Intel MPI and the oneAPI Base/HPC toolkit.
+# Copy it (obench new site NAME) or edit it to match your cluster.
+
+[site]
+description = "Example: 4x Intel Data Center GPU Max 1550 per node, Intel MPI, SLURM"
+scheduler = "slurm"
+
+[node]
+gpus_per_node = 4
+tiles_per_gpu = 2
+gpu_mode = "tile"              # 8 devices per node, one MPI rank per tile
+cores_per_node = 112
+
+[toolchain]
+tag = "oneapi-2025.2"
+setup = [
+  "source /opt/intel/oneapi/setvars.sh --force > /dev/null",
+]
+
+[slurm]
+partition = "pvc"
+account = ""
+directives = ["--exclusive"]
+
+[mpi]
+launcher = "srun"
+gpu_aware = true
+[mpi.env]
+I_MPI_OFFLOAD = "1"
+
+[env]
+SYCL_CACHE_PERSISTENT = "1"
+
+[paths]
+install_root = "~/obench/install"
+build_root = "~/obench/build"
+data_root = "~/obench/data"
+results_root = "results"

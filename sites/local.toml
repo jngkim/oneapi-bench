@@ -1,0 +1,29 @@
+# Workstation / interactive allocation profile: jobs run immediately with bash.
+# Useful for trying the workflow on one node (e.g. inside `salloc`) and for CI
+# dry runs. One GPU, no MPI launcher.
+
+[site]
+description = "Single node, jobs run directly (no sbatch)"
+scheduler = "local"
+
+[node]
+gpus_per_node = 1
+tiles_per_gpu = 1
+gpu_mode = "gpu"
+cores_per_node = 8
+
+[toolchain]
+tag = "oneapi-local"
+setup = [
+  "if [ -f /opt/intel/oneapi/setvars.sh ]; then source /opt/intel/oneapi/setvars.sh --force > /dev/null; fi",
+]
+
+[mpi]
+launcher = "mpiexec"
+gpu_aware = false
+
+[paths]
+install_root = "~/obench/install"
+build_root = "~/obench/build"
+data_root = "~/obench/data"
+results_root = "results"

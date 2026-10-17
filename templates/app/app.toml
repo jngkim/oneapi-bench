@@ -1,0 +1,30 @@
+# Application definition for @APP@. See docs/adding-an-application.md.
+
+[app]
+title = "TODO: display name"
+description = "TODO: one sentence"
+homepage = "TODO: https://..."
+license = "TODO"
+default_version = "TODO"       # sites may pin another version in [apps.@APP@]
+
+# Where the source comes from; {version} is replaced. Give either url or git.
+[source]
+url = "TODO: https://example.org/@APP@-{version}.tar.gz"
+# git = "https://github.com/ORG/@APP@.git"
+# ref = "v{version}"           # tag/branch to clone; default "{version}"
+
+[build]
+script = "build.sh"            # receives OBENCH_SRC_DIR, OBENCH_BUILD_DIR, OBENCH_PREFIX, OBENCH_JOBS
+check = ["bin/TODO"]           # files that must exist in the prefix after a successful build
+time_limit = "01:00:00"        # used with `obench build --submit`
+
+# Build settings exported to build.sh. Sites override with [apps.@APP@.build_env],
+# users with `obench build @APP@ --set KEY=VALUE`.
+[build.env]
+CMAKE_EXTRA = ""
+
+[run]
+executable = "bin/TODO"        # available to workload commands as {exe}
+
+# Runtime environment for every workload of this application.
+[run.env]

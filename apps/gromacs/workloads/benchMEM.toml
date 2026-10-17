@@ -1,0 +1,41 @@
+[workload]
+title = "benchMEM: membrane channel protein in lipids/water, 82k atoms"
+kind = "published"
+publisher = "MPI-NAT Göttingen (Kutzner et al.)"
+reference = "https://www.mpinat.mpg.de/grubmueller/bench"
+size = "small"
+scaling = "strong"
+status = "unvalidated"
+description = "Standard small-system GROMACS benchmark from the Department of Theoretical and Computational Biophysics, Max Planck Institute for Multidisciplinary Sciences."
+notes = "Also used in Kutzner et al., J. Comput. Chem. 2019 (More bang for your buck)."
+
+[[inputs]]
+url = "https://www.mpinat.mpg.de/benchMEM"
+filename = "benchMEM.zip"
+sha256 = "3c1c8cd4f274d532f48c4668e1490d389486850d6b3b258dfad4581aa11380a4"
+
+[run]
+nodes = [1]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:30:00"
+command = """{exe} mdrun -s {tpr} -nsteps {nsteps} -maxh {maxh} -resethway -noconfout -cpt -1 \\
+  -nb {nb} -pme {pme} -bonded {bonded} -update {update} {npme_flag} \\
+  -ntomp {ntomp} -pin {pin} -g md.log {extra}"""
+
+[params]
+tpr = "{input_dir}/benchMEM.tpr"
+nsteps = 20000
+maxh = 0.25                     # mdrun stops cleanly after 0.99 x maxh hours
+pme = "gpu"
+bonded = "gpu"
+update = "auto"
+nb = "gpu"
+npme = "auto"                  # "auto": one PME rank when running several ranks
+max_threads = 16               # cap on OpenMP threads per rank (-ntomp)
+pin = "auto"
+extra = ""                     # additional mdrun flags
+
+[metrics]
+primary = "ns_per_day"
+higher_is_better = true
+unit = "ns/day"

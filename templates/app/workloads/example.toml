@@ -1,0 +1,21 @@
+# Example workload for @APP@ (rename or delete). See docs/adding-a-workload.md.
+
+[workload]
+title = "TODO: short title"
+kind = "bundled"               # bundled (ships with the app) | published | custom
+publisher = ""                 # e.g. "PRACE UEABS", "NERSC"
+reference = ""                 # URL describing the benchmark
+size = "small"                 # tiny | small | medium | large | xlarge
+scaling = "strong"             # strong | weak | throughput
+status = "draft"               # draft | unvalidated | validated
+
+[run]
+nodes = [1]
+devices_per_node = [1, "max"]
+command = "{exe} --help"
+time_limit = "00:10:00"
+
+[metrics]
+primary = "time_s"
+higher_is_better = false
+unit = "s"

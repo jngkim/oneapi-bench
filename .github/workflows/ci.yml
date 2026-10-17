@@ -1,0 +1,23 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest
+      - run: python -m pytest -q
+      - run: ./obench validate
+      - name: Workload catalog is up to date
+        run: ./obench list --markdown | diff -u docs/workloads.md -
+      - name: Dry run of every workload on the example site
+        run: |
+          for w in $(./obench list | awk '/^  [a-z]/ {print $1}'); do
+            ./obench run "$w" --site example-pvc --dry-run > /dev/null
+          done

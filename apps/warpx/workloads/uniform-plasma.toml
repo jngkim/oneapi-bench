@@ -1,0 +1,35 @@
+[workload]
+title = "Uniform thermal plasma, 256^3 cells, strong scaling"
+kind = "bundled"
+publisher = "WarpX developers (Examples/Physics_applications/uniform_plasma)"
+reference = "https://github.com/BLAST-WarpX/warpx/tree/development/Examples/Physics_applications/uniform_plasma"
+size = "medium"
+scaling = "strong"
+status = "unvalidated"
+description = "The upstream 3D uniform-plasma example (periodic box, Yee solver, 2 particles per cell) enlarged to a fixed 256^3 grid; diagnostics disabled."
+notes = "Uses the input file from the WarpX source tree of the built version ({src_dir}), which must be visible on compute nodes."
+
+[run]
+nodes = [1, 2]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:20:00"
+command = """{exe} {src_dir}/Examples/Physics_applications/uniform_plasma/inputs_base_3d \
+  max_step={steps} amr.n_cell={nx} {ny} {nz} amr.max_grid_size={max_grid_size} \
+  amr.blocking_factor={blocking_factor} electrons.num_particles_per_cell_each_dim={ppc} \
+  diagnostics.enable=0 warpx.verbose=1 amrex.use_gpu_aware_mpi={mpi_gpu_aware} {extra}"""
+
+[params]
+nx = 256
+ny = 256
+nz = 256
+max_grid_size = 64             # 64 boxes: enough for up to 64 devices
+blocking_factor = 32
+ppc = "1 1 2"                  # particles per cell in x y z (upstream default)
+steps = 60
+warmup_steps = 10              # excluded from the mean step time (JIT, allocation)
+extra = ""
+
+[metrics]
+primary = "cell_updates_per_s"
+higher_is_better = true
+unit = "cell-updates/s"

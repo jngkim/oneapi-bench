@@ -1,0 +1,36 @@
+# WarpX electromagnetic particle-in-cell code (AMReX), SYCL build for Intel GPUs.
+# Options follow the WarpX Aurora (ALCF) guide:
+# https://warpx.readthedocs.io/en/latest/install/hpc/aurora.html
+
+[app]
+title = "WarpX"
+description = "Exascale particle-in-cell plasma simulation on AMReX; MPI + SYCL"
+homepage = "https://github.com/BLAST-WarpX/warpx"
+license = "BSD-3-Clause-LBNL"
+default_version = "26.10"
+
+[source]
+git = "https://github.com/BLAST-WarpX/warpx.git"
+ref = "{version}"
+
+[build]
+script = "build.sh"
+check = ["bin/warpx.3d"]
+time_limit = "02:00:00"
+
+# CMake downloads AMReX and PICSAR during configure: build on a node with internet
+# access (the login node, i.e. without --submit) unless they are provided locally.
+[build.env]
+WARPX_DIMS = "3"
+WARPX_FFT = "ON"                       # spectral (PSATD) solver via oneMKL; named WarpX_PSATD before 24.06
+WARPX_OPENPMD = "OFF"                  # benchmarks here write no diagnostics
+WARPX_QED = "OFF"
+WARPX_PRECISION = "DOUBLE"
+AMREX_INTEL_ARCH = ""                  # ahead-of-time compile for e.g. "pvc"; empty = JIT
+CMAKE_EXTRA = ""
+
+[run]
+executable = "bin/warpx.3d"
+
+[run.env]
+SYCL_CACHE_PERSISTENT = "1"

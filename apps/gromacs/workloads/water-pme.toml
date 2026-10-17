@@ -1,0 +1,43 @@
+[workload]
+title = "Water box with PME (select size: 0.65k to 3072k atoms)"
+kind = "bundled"
+publisher = "GROMACS developers (ftp.gromacs.org/pub/benchmarks)"
+reference = "https://ftp.gromacs.org/pub/benchmarks/"
+size = "medium"
+scaling = "strong"
+status = "unvalidated"
+description = "SPC water boxes from water_GMX50_bare; the directory name is the size in thousands of atoms."
+notes = "Choose the size with --set water_size=1536 (0000.65 ... 3072). The old-style .mdp needs -maxwarn for obsolete entries; the .tpr is generated with gmx grompp per run."
+
+[[inputs]]
+url = "https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz"
+sha256 = "2219c10acb97787f80f6638132bad3ff2ca1e68600eef1bc8b89d9560e74c66a"
+
+[run]
+nodes = [1, 2]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:30:00"
+prepare = ["{exe} grompp -f {input_dir}/water-cut1.0_GMX50_bare/{water_size}/pme.mdp -c {input_dir}/water-cut1.0_GMX50_bare/{water_size}/conf.gro -p {input_dir}/water-cut1.0_GMX50_bare/{water_size}/topol.top -o topol.tpr -maxwarn {maxwarn}"]
+command = """{exe} mdrun -s {tpr} -nsteps {nsteps} -maxh {maxh} -resethway -noconfout -cpt -1 \\
+  -nb {nb} -pme {pme} -bonded {bonded} -update {update} {npme_flag} \\
+  -ntomp {ntomp} -pin {pin} -g md.log {extra}"""
+
+[params]
+tpr = "topol.tpr"
+nsteps = 20000
+maxh = 0.25                     # mdrun stops cleanly after 0.99 x maxh hours
+pme = "gpu"
+bonded = "auto"
+update = "auto"
+water_size = "0384"            # thousands of atoms: 0000.65 0001.5 0003 ... 0384 0768 1536 3072
+maxwarn = 5
+nb = "gpu"
+npme = "auto"                  # "auto": one PME rank when running several ranks
+max_threads = 16               # cap on OpenMP threads per rank (-ntomp)
+pin = "auto"
+extra = ""                     # additional mdrun flags
+
+[metrics]
+primary = "ns_per_day"
+higher_is_better = true
+unit = "ns/day"

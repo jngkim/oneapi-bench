@@ -1,0 +1,36 @@
+[workload]
+title = "128^3 C2C FFT of the LAMMPS Rhodopsin PPPM grid (heFFTe ICCS 2020)"
+kind = "published"
+publisher = "ICL, University of Tennessee (Ayala et al., ICCS 2020)"
+reference = "https://doi.org/10.1007/978-3-030-50371-0_19"
+size = "tiny"
+scaling = "strong"
+status = "unvalidated"
+description = "FFT grid size of the LAMMPS Rhodopsin benchmark used as an application-sized case in the heFFTe paper (2 Summit nodes)."
+notes = "Latency/communication bound; good for testing small-message behaviour of GPU-aware MPI."
+
+[run]
+nodes = [1, 2]
+devices_per_node = [1, 2, 4, "max"]
+min_devices = 1
+time_limit = "00:10:00"
+command = "{prefix}/bin/speed3d_{transform} {backend} {precision} {nx} {ny} {nz} {options}"
+
+[params]
+transform = "c2c"            # c2c | r2c | r2r
+backend = "onemkl"             # SYCL/oneMKL GPU backend
+precision = "double"           # float | double
+nx = 128
+ny = 128
+nz = 128
+# speed3d flags, e.g. -pencils / -slabs, -a2a / -a2av / -p2p / -p2p_pl, -reorder / -no-reorder,
+# -no-gpu-aware, -n10 (number of timed runs; default 5).
+options = ""
+
+[metrics]
+primary = "gflops"
+higher_is_better = true
+unit = "GFlop/s"
+
+[validate]
+backend = "onemkl"

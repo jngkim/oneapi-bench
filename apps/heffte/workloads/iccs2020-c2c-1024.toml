@@ -1,0 +1,36 @@
+[workload]
+title = "1024^3 C2C strong scaling (heFFTe ICCS 2020)"
+kind = "published"
+publisher = "ICL, University of Tennessee (Ayala et al., ICCS 2020)"
+reference = "https://doi.org/10.1007/978-3-030-50371-0_19"
+size = "large"
+scaling = "strong"
+status = "unvalidated"
+description = "The 1024^3 double-complex FFT used for heFFTe strong scaling on OLCF Summit (up to 1024 nodes / 6144 V100 GPUs)."
+notes = "16 GiB of input plus work buffers: start with several devices. The paper measured on Summit; this is the same problem size, not the same machine."
+
+[run]
+nodes = [1, 2, 4, 8, 16]
+devices_per_node = ["max"]
+min_devices = 2
+time_limit = "00:20:00"
+command = "{prefix}/bin/speed3d_{transform} {backend} {precision} {nx} {ny} {nz} {options}"
+
+[params]
+transform = "c2c"            # c2c | r2c | r2r
+backend = "onemkl"             # SYCL/oneMKL GPU backend
+precision = "double"           # float | double
+nx = 1024
+ny = 1024
+nz = 1024
+# speed3d flags, e.g. -pencils / -slabs, -a2a / -a2av / -p2p / -p2p_pl, -reorder / -no-reorder,
+# -no-gpu-aware, -n10 (number of timed runs; default 5).
+options = ""
+
+[metrics]
+primary = "gflops"
+higher_is_better = true
+unit = "GFlop/s"
+
+[validate]
+backend = "onemkl"

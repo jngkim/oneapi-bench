@@ -1,0 +1,38 @@
+[workload]
+title = "WarpX performance test 1: uniform plasma at rest, 32 ppc, weak scaling"
+kind = "bundled"
+publisher = "WarpX developers (Tools/PerformanceTests, run on OLCF Summit and NERSC Cori)"
+reference = "https://github.com/BLAST-WarpX/warpx/tree/24.08/Tools/PerformanceTests"
+size = "medium"
+scaling = "weak"
+status = "unvalidated"
+description = "Electrons and ions, 2x2x4 particles per cell each, PEC/periodic boundaries, cubic shape factors. The automated Summit test used 128x128x192 cells per 6-GPU node (64x64x128 per GPU) and doubled the grid one axis at a time when doubling the node count."
+notes = "The suite was removed from WarpX after 24.08; the input is fetched from that tag. Weak scaling here is per device and needs power-of-two device counts. Default steps follow the original (10)."
+
+[[inputs]]
+url = "https://raw.githubusercontent.com/BLAST-WarpX/warpx/24.08/Tools/PerformanceTests/automated_test_1_uniform_rest_32ppc"
+filename = "automated_test_1_uniform_rest_32ppc"
+sha256 = "1b12d78aa360da0703563cd3854488a8038acff8c33d6c77d3ed0e5e91bb024c"
+extract = false
+
+[run]
+nodes = [1, 2, 4]
+devices_per_node = [1, 2, 4, 8]
+time_limit = "00:20:00"
+command = """{exe} {input_dir}/automated_test_1_uniform_rest_32ppc \
+  max_step={steps} amr.n_cell={nx} {ny} {nz} amr.max_grid_size={max_grid_size} \
+  amr.blocking_factor={blocking_factor} warpx.verbose=1 \
+  amrex.use_gpu_aware_mpi={mpi_gpu_aware} {extra}"""
+
+[params]
+cells_per_device = "64 64 128" # grid on one device; doubled x, y, z in turn per doubling of devices
+max_grid_size = 256
+blocking_factor = 32
+steps = 10
+warmup_steps = 2
+extra = ""
+
+[metrics]
+primary = "cell_updates_per_s"
+higher_is_better = true
+unit = "cell-updates/s"

@@ -1,0 +1,41 @@
+[workload]
+title = "HECBioSim benchmark suite (select system: 20k to 3000k atoms)"
+kind = "published"
+publisher = "HECBioSim (UK High End Computing Consortium for Biomolecular Simulation)"
+reference = "https://www.hecbiosim.org/access-hpc/hpc-benchmarking-suite"
+size = "medium"
+scaling = "strong"
+status = "unvalidated"
+description = "Five systems: 3NIR crambin 20k, 1WDN 61k, hEGFR dimer 465k, pair of hEGFR dimers 1.4M, pair of hEGFR tetramers 3M atoms."
+notes = "Choose the system with --set system=61k (one of 20k, 61k, 465k, 1400k, 3000k)."
+
+[[inputs]]
+url = "https://file-store.hecbiosim.org/benchmark-suite/gromacs.tar.xz"
+sha256 = "5251c4b146cd1b68ef9e966cc31730dc04db366031937c287c9d7d5bd7737f48"
+
+[run]
+nodes = [1, 2]
+devices_per_node = [1, 2, 4, "max"]
+time_limit = "00:45:00"
+command = """{exe} mdrun -s {tpr} -nsteps {nsteps} -maxh {maxh} -resethway -noconfout -cpt -1 \\
+  -nb {nb} -pme {pme} -bonded {bonded} -update {update} {npme_flag} \\
+  -ntomp {ntomp} -pin {pin} -g md.log {extra}"""
+
+[params]
+tpr = "{input_dir}/gromacs/{system}-atoms/benchmark.tpr"
+nsteps = 10000
+maxh = 0.5                     # mdrun stops cleanly after 0.99 x maxh hours
+pme = "gpu"
+bonded = "gpu"
+update = "auto"
+system = "465k"               # 20k | 61k | 465k | 1400k | 3000k
+nb = "gpu"
+npme = "auto"                  # "auto": one PME rank when running several ranks
+max_threads = 16               # cap on OpenMP threads per rank (-ntomp)
+pin = "auto"
+extra = ""                     # additional mdrun flags
+
+[metrics]
+primary = "ns_per_day"
+higher_is_better = true
+unit = "ns/day"
